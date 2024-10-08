@@ -1,0 +1,4 @@
+{
+  "Message_NoShake_Enabled": "has been {green}Enabled",
+  "Message_NoShake_Disabled": "has been {red}Disabled"
+} 
