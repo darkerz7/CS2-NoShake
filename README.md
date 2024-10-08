@@ -9,3 +9,7 @@ Disable env_shake
 1. Install `ClientPrefs_CS2`
 2. Compile or copy CS2-NoShake to `counterstrikesharp/plugins/CS2-NoShake` folger
 3. Restart server
+
+## Commands:
+`css_shake` - Disables or enables screen shakes
+`css_noshake` - Disables or enables screen shakes
