@@ -6,31 +6,44 @@ using CounterStrikeSharp.API.Modules.UserMessages;
 using ClientPrefsAPI;
 using CounterStrikeSharp.API.Core.Translations;
 using Microsoft.Extensions.Localization;
+using CounterStrikeSharp.API.Core.Capabilities;
 
 namespace CS2_NoShake
 {
 	public class NoShake : BasePlugin
 	{
 		static bool[] g_bNoShake = new bool[65];
-		static IClientPrefsApi? _CP_api;
+		static IClientPrefsAPI? _CP_api;
 		static IStringLocalizer? Strlocalizer;
 
 		public override string ModuleName => "NoShake";
 		public override string ModuleDescription => "Disable env_shake";
 		public override string ModuleAuthor => "DarkerZ [RUS]";
-		public override string ModuleVersion => "1.DZ.0";
-
-		public override void Load(bool hotReload)
+		public override string ModuleVersion => "1.DZ.1";
+		public override void OnAllPluginsLoaded(bool hotReload)
 		{
-			_CP_api = IClientPrefsApi.Capability.Get();
-			Strlocalizer = Localizer;
+			try
+			{
+				PluginCapability<IClientPrefsAPI> CapabilityEW = new("clientprefs:api");
+				_CP_api = IClientPrefsAPI.Capability.Get();
+			}
+			catch (Exception)
+			{
+				_CP_api = null;
+				PrintToConsole("ClientPrefs API Failed!");
+			}
+
 			if (hotReload)
 			{
-				Utilities.GetPlayers().ForEach(player =>
+				Utilities.GetPlayers().Where(p => p is { IsValid: true, IsBot: false, IsHLTV: false }).ToList().ForEach(player =>
 				{
 					GetValue(player);
 				});
 			}
+		}
+		public override void Load(bool hotReload)
+		{
+			Strlocalizer = Localizer;
 			RegisterEventHandler<EventPlayerConnectFull>(OnEventPlayerConnectFull);
 			RegisterEventHandler<EventPlayerDisconnect>(OnEventPlayerDisconnect);
 			HookUserMessage(120, OnShake, HookMode.Pre);
@@ -115,6 +128,7 @@ namespace CS2_NoShake
 
 		static void ReplyToCommand(CCSPlayerController player, bool bConsole, string sMessage, params object[] arg)
 		{
+			if (Strlocalizer == null) return;
 			Server.NextFrame(() =>
 			{
 				if (player is { IsValid: true, IsBot: false, IsHLTV: false })
@@ -126,6 +140,23 @@ namespace CS2_NoShake
 					}
 				}
 			});
+		}
+		public static void PrintToConsole(string sMessage, int iColor = 1)
+		{
+			Console.ForegroundColor = (ConsoleColor)8;
+			Console.Write("[");
+			Console.ForegroundColor = (ConsoleColor)6;
+			Console.Write("NoShake");
+			Console.ForegroundColor = (ConsoleColor)8;
+			Console.Write("] ");
+			Console.ForegroundColor = (ConsoleColor)iColor;
+			Console.WriteLine(sMessage, false);
+			Console.ResetColor();
+			/* Colors:
+				* 0 - No color		1 - White		2 - Red-Orange		3 - Orange
+				* 4 - Yellow		5 - Dark Green	6 - Green			7 - Light Green
+				* 8 - Cyan			9 - Sky			10 - Light Blue		11 - Blue
+				* 12 - Violet		13 - Pink		14 - Light Red		15 - Red */
 		}
 	}
 }
