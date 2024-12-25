@@ -19,7 +19,7 @@ namespace CS2_NoShake
 		public override string ModuleName => "NoShake";
 		public override string ModuleDescription => "Disable env_shake";
 		public override string ModuleAuthor => "DarkerZ [RUS]";
-		public override string ModuleVersion => "1.DZ.1";
+		public override string ModuleVersion => "1.DZ.2";
 		public override void OnAllPluginsLoaded(bool hotReload)
 		{
 			try
@@ -103,12 +103,12 @@ namespace CS2_NoShake
 			}
 		}
 
-		async void GetValue(CCSPlayerController? player)
+		void GetValue(CCSPlayerController? player)
 		{
 			if (player == null || !player.IsValid) return;
 			if (_CP_api != null)
 			{
-				string sValue = await _CP_api.GetClientCookie(player.SteamID.ToString(), "NoShake");
+				string sValue = _CP_api.GetClientCookie(player.SteamID.ToString(), "NoShake");
 				int iValue;
 				if (string.IsNullOrEmpty(sValue) || !Int32.TryParse(sValue, out iValue)) iValue = 0;
 				if (iValue == 0) g_bNoShake[player.Slot] = false;
@@ -116,13 +116,13 @@ namespace CS2_NoShake
 			}
 		}
 
-		async void SetValue(CCSPlayerController? player)
+		void SetValue(CCSPlayerController? player)
 		{
 			if (player == null || !player.IsValid) return;
 			if (_CP_api != null)
 			{
-				if (g_bNoShake[player.Slot]) await _CP_api.SetClientCookie(player.SteamID.ToString(), "NoShake", "1");
-				else await _CP_api.SetClientCookie(player.SteamID.ToString(), "NoShake", "0");
+				if (g_bNoShake[player.Slot]) _CP_api.SetClientCookie(player.SteamID.ToString(), "NoShake", "1");
+				else _CP_api.SetClientCookie(player.SteamID.ToString(), "NoShake", "0");
 			}
 		}
 
