@@ -3,35 +3,29 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.UserMessages;
-using ClientPrefsAPI;
 using CounterStrikeSharp.API.Core.Translations;
 using Microsoft.Extensions.Localization;
 using CounterStrikeSharp.API.Core.Capabilities;
+using PlayerSettings;
 
 namespace CS2_NoShake
 {
 	public class NoShake : BasePlugin
 	{
+		private ISettingsApi? _PlayerSettingsAPI;
+		private readonly PluginCapability<ISettingsApi?> _PlayerSettingsAPICapability = new("settings:nfcore");
 		static bool[] g_bNoShake = new bool[65];
-		static IClientPrefsAPI? _CP_api;
 		static IStringLocalizer? Strlocalizer;
 
 		public override string ModuleName => "NoShake";
 		public override string ModuleDescription => "Disable env_shake";
 		public override string ModuleAuthor => "DarkerZ [RUS]";
-		public override string ModuleVersion => "1.DZ.2";
+		public override string ModuleVersion => "1.DZ.2.1";
 		public override void OnAllPluginsLoaded(bool hotReload)
 		{
-			try
-			{
-				PluginCapability<IClientPrefsAPI> CapabilityEW = new("clientprefs:api");
-				_CP_api = IClientPrefsAPI.Capability.Get();
-			}
-			catch (Exception)
-			{
-				_CP_api = null;
-				PrintToConsole("ClientPrefs API Failed!");
-			}
+			_PlayerSettingsAPI = _PlayerSettingsAPICapability.Get();
+			if (_PlayerSettingsAPI == null)
+				PrintToConsole("PlayerSettings core not found...");
 
 			if (hotReload)
 			{
@@ -106,11 +100,10 @@ namespace CS2_NoShake
 		void GetValue(CCSPlayerController? player)
 		{
 			if (player == null || !player.IsValid) return;
-			if (_CP_api != null)
+			if (_PlayerSettingsAPI != null)
 			{
-				string sValue = _CP_api.GetClientCookie(player.SteamID.ToString(), "NoShake");
-				int iValue;
-				if (string.IsNullOrEmpty(sValue) || !Int32.TryParse(sValue, out iValue)) iValue = 0;
+				string sValue = _PlayerSettingsAPI.GetPlayerSettingsValue(player, "NoShake", "1");
+				if (string.IsNullOrEmpty(sValue) || !Int32.TryParse(sValue, out int iValue)) iValue = 1;
 				if (iValue == 0) g_bNoShake[player.Slot] = false;
 				else g_bNoShake[player.Slot] = true;
 			}
@@ -119,10 +112,10 @@ namespace CS2_NoShake
 		void SetValue(CCSPlayerController? player)
 		{
 			if (player == null || !player.IsValid) return;
-			if (_CP_api != null)
+			if (_PlayerSettingsAPI != null)
 			{
-				if (g_bNoShake[player.Slot]) _CP_api.SetClientCookie(player.SteamID.ToString(), "NoShake", "1");
-				else _CP_api.SetClientCookie(player.SteamID.ToString(), "NoShake", "0");
+				if (g_bNoShake[player.Slot]) _PlayerSettingsAPI.SetPlayerSettingsValue(player, "NoShake", "1");
+				else _PlayerSettingsAPI.SetPlayerSettingsValue(player, "NoShake", "0");
 			}
 		}
 
