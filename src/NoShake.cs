@@ -20,7 +20,7 @@ namespace CS2_NoShake
 		public override string ModuleName => "NoShake";
 		public override string ModuleDescription => "Disable env_shake";
 		public override string ModuleAuthor => "DarkerZ [RUS]";
-		public override string ModuleVersion => "1.DZ.2.1";
+		public override string ModuleVersion => "1.DZ.2.2";
 		public override void OnAllPluginsLoaded(bool hotReload)
 		{
 			_PlayerSettingsAPI = _PlayerSettingsAPICapability.Get();
@@ -122,7 +122,7 @@ namespace CS2_NoShake
 		static void ReplyToCommand(CCSPlayerController player, bool bConsole, string sMessage, params object[] arg)
 		{
 			if (Strlocalizer == null) return;
-			Server.NextFrame(() =>
+			Server.NextWorldUpdate(() =>
 			{
 				if (player is { IsValid: true, IsBot: false, IsHLTV: false })
 				{
