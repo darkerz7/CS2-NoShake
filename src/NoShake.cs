@@ -1,16 +1,18 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Attributes;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
+using CounterStrikeSharp.API.Core.Capabilities;
+using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.UserMessages;
-using CounterStrikeSharp.API.Core.Translations;
 using Microsoft.Extensions.Localization;
-using CounterStrikeSharp.API.Core.Capabilities;
 using PlayerSettings;
 
 namespace CS2_NoShake
 {
-	public class NoShake : BasePlugin
+    [MinimumApiVersion(369)]
+    public class NoShake : BasePlugin
 	{
 		private ISettingsApi? _PlayerSettingsAPI;
 		private readonly PluginCapability<ISettingsApi?> _PlayerSettingsAPICapability = new("settings:nfcore");
@@ -20,7 +22,7 @@ namespace CS2_NoShake
 		public override string ModuleName => "NoShake";
 		public override string ModuleDescription => "Disable env_shake";
 		public override string ModuleAuthor => "DarkerZ [RUS]";
-		public override string ModuleVersion => "1.DZ.2.2";
+		public override string ModuleVersion => "1.DZ.3";
 		public override void OnAllPluginsLoaded(bool hotReload)
 		{
 			_PlayerSettingsAPI = _PlayerSettingsAPICapability.Get();
